@@ -6,6 +6,8 @@ interface SystemPromptEditorProps {
   meetingInfo: {
     title: string;
     purpose: string;
+    date: string;
+    participants: string[];
   };
 }
 
@@ -14,10 +16,10 @@ const DEFAULT_PROMPT = `Bạn là trợ lý AI tổng hợp và tóm tắt cuộ
 Bản tóm tắt nên bao gồm:
 
 1. Thông tin cơ bản:
-   - Tiêu đề: {title}
-   - Mục đích: {purpose} 
-   - Thời gian: {date}
-   - Người tham gia: {participants}
+   - Tiêu đề: **{title}**
+   - Mục đích: **{purpose}** 
+   - Thời gian: **{date}**
+   - Người tham gia: **{participants}**
 
 2. Tóm tắt chính (5-7 câu tổng hợp nội dung quan trọng nhất)
 
@@ -33,15 +35,31 @@ Bản tóm tắt nên bao gồm:
 
 Hãy viết bằng giọng điệu chuyên nghiệp nhưng dễ hiểu. Tập trung vào những thông tin quan trọng và bỏ qua các phần tán gẫu không liên quan. Sử dụng định dạng Markdown để tổ chức nội dung.`;
 
+// Replace variables with highlighted versions for display in the UI
+const formatPromptForDisplay = (prompt: string) => {
+  return prompt
+    .replace(/\*\*\{title\}\*\*/g, '<span class="param-highlight">{title}</span>')
+    .replace(/\*\*\{purpose\}\*\*/g, '<span class="param-highlight">{purpose}</span>')
+    .replace(/\*\*\{date\}\*\*/g, '<span class="param-highlight">{date}</span>')
+    .replace(/\*\*\{participants\}\*\*/g, '<span class="param-highlight">{participants}</span>');
+};
+
 export function SystemPromptEditor({ onSubmit, meetingInfo }: SystemPromptEditorProps) {
-  const formattedDefaultPrompt = DEFAULT_PROMPT
-    .replace('{title}', meetingInfo.title)
-    .replace('{purpose}', meetingInfo.purpose);
+  // Tạo hàm để tạo prompt với tất cả thông tin
+  const createFormattedPrompt = () => {
+    return DEFAULT_PROMPT
+      .replace('{title}', meetingInfo.title)
+      .replace('{purpose}', meetingInfo.purpose)
+      .replace('{date}', meetingInfo.date)
+      .replace('{participants}', meetingInfo.participants.join(', '));
+  };
 
-  const [prompt, setPrompt] = useState(formattedDefaultPrompt);
+  // Khởi tạo prompt với tất cả thông tin
+  const [prompt, setPrompt] = useState(createFormattedPrompt());
 
+  // Khôi phục prompt mặc định với các giá trị hiện tại
   const handleResetPrompt = () => {
-    setPrompt(formattedDefaultPrompt);
+    setPrompt(createFormattedPrompt());
   };
 
   const handleSubmit = (e: React.FormEvent) => {
@@ -80,7 +98,7 @@ export function SystemPromptEditor({ onSubmit, meetingInfo }: SystemPromptEditor
             required
           />
           <p className="mt-1 text-xs text-content/70">
-            Sử dụng các biến như {'{title}'}, {'{purpose}'}, {'{date}'}, {'{participants}'} để đưa thông tin cuộc họp vào prompt.
+            Sử dụng các biến như <span className="font-semibold bg-green-600/20 px-1 rounded text-content">{'{title}'}</span>, <span className="font-semibold bg-green-600/20 px-1 rounded text-content">{'{purpose}'}</span>, <span className="font-semibold bg-green-600/20 px-1 rounded text-content">{'{date}'}</span>, <span className="font-semibold bg-green-600/20 px-1 rounded text-content">{'{participants}'}</span> để đưa thông tin cuộc họp vào prompt.
           </p>
         </div>
         
@@ -93,6 +111,15 @@ export function SystemPromptEditor({ onSubmit, meetingInfo }: SystemPromptEditor
           </button>
         </div>
       </form>
+
+      <style jsx>{`
+        .param-highlight {
+          background-color: rgba(22, 163, 74, 0.2);
+          font-weight: 600;
+          padding: 0 2px;
+          border-radius: 2px;
+        }
+      `}</style>
     </div>
   );
 } 

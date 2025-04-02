@@ -79,6 +79,63 @@ Truy cập ứng dụng tại [http://localhost:3005](http://localhost:3005)
 
 Dự án này đã được triển khai trên Cloudflare Pages: [https://meeting-recap-ai.pages.dev](https://meeting-recap-ai.pages.dev)
 
+### Triển khai lên Cloudflare Pages
+
+1. Đăng ký tài khoản [Cloudflare](https://dash.cloudflare.com/sign-up)
+2. Từ dashboard, chọn "Pages" và click "Create a project"
+3. Chọn "Connect to Git" và kết nối với repository GitHub của bạn
+4. Cấu hình build:
+   - Build command: `npm run build`
+   - Build output directory: `out`
+   - Node.js version: `18.x` (hoặc cao hơn)
+5. Thêm biến môi trường trong tab "Settings > Environment variables":
+   - `NEXT_PUBLIC_GEMINI_API_KEY`: API key của bạn
+6. Trigger deploy lại và ứng dụng sẽ khả dụng tại URL của Cloudflare Pages
+
+### Triển khai lên Cloudflare Workers
+
+1. Cài đặt Wrangler CLI:
+   ```bash
+   npm install -g wrangler
+   ```
+
+2. Đăng nhập vào Cloudflare từ terminal:
+   ```bash
+   wrangler login
+   ```
+
+3. Tạo file `wrangler.toml` trong thư mục gốc dự án:
+   ```toml
+   name = "meeting-recap-ai"
+   main = "./.next/standalone/server.js"
+   compatibility_date = "2023-12-01"
+   compatibility_flags = ["nodejs_compat"]
+   
+   [site]
+   bucket = "./.next/static"
+   
+   [build]
+   command = "npm run build"
+   
+   [vars]
+   NEXT_PUBLIC_GEMINI_API_KEY = "your_gemini_api_key_here"
+   ```
+
+4. Sửa file `next.config.js` để hỗ trợ Workers:
+   ```js
+   const nextConfig = {
+     // ... cấu hình hiện tại
+     output: 'standalone',
+   };
+   ```
+
+5. Triển khai lên Cloudflare Workers:
+   ```bash
+   wrangler deploy
+   ```
+
+6. Sau khi triển khai thành công, bạn sẽ nhận được URL để truy cập ứng dụng
+
 ## Giấy phép
 
 MIT License
