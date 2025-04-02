@@ -1,7 +1,6 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   output: 'export',
-  distDir: '.next',
   images: {
     unoptimized: true,
   },
@@ -22,7 +21,6 @@ const nextConfig = {
     };
     return config;
   },
-  reactStrictMode: true,
 };
 
 // Sử dụng cú pháp ES Module để tương thích với Node.js v23+
