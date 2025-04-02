@@ -3,16 +3,23 @@
 import { useEffect, useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from './ui/card';
 import { Progress } from './ui/progress';
-import { processLocalAudio } from '@/app/lib/ai-service';
+import { processLocalAudio, processGoogleDriveAudio } from '@/app/lib/ai-service';
+import { MeetingInfo } from './meeting-info-form';
+
+// Định nghĩa kiểu dữ liệu cho nguồn âm thanh (local hoặc drive)
+type AudioSource = {
+  type: 'local' | 'drive';
+  data: File | string;
+};
 
 interface ProcessingScreenProps {
   onComplete: (result: string) => void;
-  audioFile: File;
-  meetingInfo: any;
+  audioSource: AudioSource;
+  meetingInfo: MeetingInfo;
   promptConfig: any;
 }
 
-export function ProcessingScreen({ onComplete, audioFile, meetingInfo, promptConfig }: ProcessingScreenProps) {
+export function ProcessingScreen({ onComplete, audioSource, meetingInfo, promptConfig }: ProcessingScreenProps) {
   const [progress, setProgress] = useState(0);
   const [currentStep, setCurrentStep] = useState<string>('Chuẩn bị xử lý...');
   const [error, setError] = useState<string | null>(null);
@@ -24,10 +31,19 @@ export function ProcessingScreen({ onComplete, audioFile, meetingInfo, promptCon
         setProgress(20);
         setCurrentStep('Đang chuẩn bị xử lý file âm thanh...');
 
+        let recap: string;
+
         // 2. Xử lý với Gemini API
         setProgress(50);
         setCurrentStep('Đang phân tích nội dung cuộc họp...');
-        const recap = await processLocalAudio(audioFile, meetingInfo, promptConfig);
+        
+        if (audioSource.type === 'local') {
+          recap = await processLocalAudio(audioSource.data as File, meetingInfo, promptConfig);
+        } else if (audioSource.type === 'drive') {
+          recap = await processGoogleDriveAudio(audioSource.data as string, meetingInfo, promptConfig);
+        } else {
+          throw new Error('Không hỗ trợ định dạng nguồn âm thanh này');
+        }
 
         // 3. Hoàn tất
         setProgress(100);
@@ -43,12 +59,16 @@ export function ProcessingScreen({ onComplete, audioFile, meetingInfo, promptCon
     };
 
     processAudio();
-  }, [audioFile, meetingInfo, promptConfig, onComplete]);
+  }, [audioSource, meetingInfo, promptConfig, onComplete]);
 
   return (
     <Card className="w-full">
       <CardHeader>
-        <CardTitle>Đang xử lý file âm thanh</CardTitle>
+        <CardTitle>
+          {audioSource.type === 'local' 
+            ? 'Đang xử lý file âm thanh' 
+            : 'Đang tải và xử lý file từ Google Drive'}
+        </CardTitle>
       </CardHeader>
       <CardContent className="space-y-4">
         <Progress value={progress} className="w-full" />

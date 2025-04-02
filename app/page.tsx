@@ -13,25 +13,37 @@ import { toast } from 'sonner';
 // Define the application steps
 type Step = 'upload' | 'info' | 'prompt' | 'processing' | 'result';
 
+// Định nghĩa kiểu dữ liệu cho file âm thanh (local hoặc drive)
+type AudioSource = {
+  type: 'local' | 'drive';
+  data: File | string;
+};
+
 export default function Home() {
   // State for tracking the current step
   const [currentStep, setCurrentStep] = useState<Step>('upload');
   
   // State for storing data at each step
-  const [audioFile, setAudioFile] = useState<File | null>(null);
+  const [audioSource, setAudioSource] = useState<AudioSource | null>(null);
   const [meetingInfo, setMeetingInfo] = useState<MeetingInfo | null>(null);
   const [systemPrompt, setSystemPrompt] = useState<string>('');
   const [recapResult, setRecapResult] = useState<string>('');
   
   // Handle file selection
   const handleFileSelect = (result: { type: 'local' | 'drive'; data: any }) => {
+    setAudioSource(result);
+    
     if (result.type === 'local') {
-      setAudioFile(result.data);
       toast.success('File đã được tải lên', {
         description: 'Bắt đầu xử lý file âm thanh'
       });
-      setCurrentStep('info');
+    } else if (result.type === 'drive') {
+      toast.success('Đường dẫn Google Drive đã được thêm', {
+        description: 'File âm thanh sẽ được tải từ Google Drive'
+      });
     }
+    
+    setCurrentStep('info');
   };
   
   // Handle meeting info submission
@@ -54,7 +66,7 @@ export default function Home() {
   
   // Handle reset to start over
   const handleReset = () => {
-    setAudioFile(null);
+    setAudioSource(null);
     setMeetingInfo(null);
     setSystemPrompt('');
     setRecapResult('');
@@ -94,10 +106,10 @@ export default function Home() {
             />
           )}
           
-          {currentStep === 'processing' && audioFile && meetingInfo && (
+          {currentStep === 'processing' && audioSource && meetingInfo && (
             <ProcessingScreen 
               onComplete={handleProcessingComplete}
-              audioFile={audioFile}
+              audioSource={audioSource}
               meetingInfo={meetingInfo}
               promptConfig={{ customPrompt: systemPrompt }}
             />

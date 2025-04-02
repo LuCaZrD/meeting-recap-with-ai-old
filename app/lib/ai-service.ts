@@ -123,12 +123,31 @@ export async function processGoogleDriveAudio(
   promptConfig: SystemPromptConfig
 ): Promise<string> {
   try {
-    // Tải file từ Google Drive
-    const response = await fetch(driveUrl);
+    console.log('Bắt đầu tải file từ Google Drive:', driveUrl);
+    
+    // Gửi yêu cầu đến proxy API để tải file thay vì làm trực tiếp
+    // Trong triển khai thực tế, bạn nên có API endpoint để xử lý việc này
+    const response = await fetch(`/api/google-drive-proxy?url=${encodeURIComponent(driveUrl)}`);
+    
+    if (!response.ok) {
+      const errorText = await response.text();
+      throw new Error(`Không thể tải file từ Google Drive: ${errorText}`);
+    }
+    
     const blob = await response.blob();
     
+    // Xác định loại MIME dựa trên phần mở rộng hoặc phản hồi
+    let mimeType = 'audio/mpeg'; // Mặc định là MP3
+    const contentType = response.headers.get('content-type');
+    if (contentType && contentType.startsWith('audio/')) {
+      mimeType = contentType;
+    }
+    
     // Chuyển blob thành File object
-    const file = new File([blob], 'audio.mp3', { type: blob.type });
+    const filename = driveUrl.split('/').pop() || 'audio-from-drive';
+    const file = new File([blob], filename, { type: mimeType });
+    
+    console.log(`Đã tải file từ Drive: ${filename}, kích thước: ${(blob.size / (1024 * 1024)).toFixed(2)}MB`);
     
     // Xử lý file như local audio
     return await processLocalAudio(file, meetingInfo, promptConfig);
