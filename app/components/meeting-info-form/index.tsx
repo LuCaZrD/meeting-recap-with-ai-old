@@ -171,7 +171,8 @@ export function MeetingInfoForm({ onSubmit }: MeetingInfoFormProps) {
                       onChange={(e) => handleParticipantChange(index, 'name', e.target.value)}
                       className="text-sm"
                     />
-                    </div>
+                    <div className="text-xs text-muted-foreground ml-1">Tên</div>
+                  </div>
                   
                   <div className="flex items-center gap-3">
                     <div className="flex-1 space-y-1">
@@ -181,6 +182,7 @@ export function MeetingInfoForm({ onSubmit }: MeetingInfoFormProps) {
                         onChange={(e) => handleParticipantChange(index, 'title', e.target.value)}
                         className="text-sm"
                       />
+                      <div className="text-xs text-muted-foreground ml-1">Chức vụ</div>
                     </div>
                     
                     {index > 0 && (
