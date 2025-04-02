@@ -35,20 +35,45 @@
 - TypeScript
 - Tailwind CSS
 - React Markdown
+- Google Generative AI (Gemini API)
 
 ## Cách cài đặt
 
 ```bash
 # Clone repository
-git clone https://github.com/yourusername/meeting-recap-ai.git
-cd meeting-recap-ai
+git clone https://github.com/quangkhai771/meeting-recap-with-ai.git
+cd meeting-recap-with-ai
 
 # Cài đặt dependencies
 npm install
 
-# Chạy môi trường development
+# Cài đặt Google Generative AI và types
+npm install @google/generative-ai @types/node --save
+```
+
+### Cấu hình biến môi trường
+
+1. Tạo file `.env.local` trong thư mục gốc của dự án
+2. Thêm API key của Google Gemini vào file:
+
+```
+# .env.local
+NEXT_PUBLIC_GEMINI_API_KEY=YOUR_GEMINI_API_KEY
+```
+
+Để lấy Gemini API key:
+- Truy cập [Google AI Studio](https://makersuite.google.com/app/apikey)
+- Đăng nhập và tạo API key mới
+- Sao chép và dán vào file `.env.local`
+
+### Chạy ứng dụng
+
+```bash
+# Khởi động môi trường development
 npm run dev
 ```
+
+Truy cập ứng dụng tại [http://localhost:3005](http://localhost:3005)
 
 ## Triển khai
 
