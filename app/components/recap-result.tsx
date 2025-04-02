@@ -21,11 +21,11 @@ export function RecapResult({ result, onReset }: RecapResultProps) {
   };
 
   const handleDownload = () => {
-    const blob = new Blob([result], { type: 'text/markdown' });
+    const blob = new Blob([result], { type: 'text/plain' });
     const url = URL.createObjectURL(blob);
     const a = document.createElement('a');
     a.href = url;
-    a.download = `meeting-recap-${new Date().toISOString().split('T')[0]}.md`;
+    a.download = `meeting-recap-${new Date().toISOString().split('T')[0]}.txt`;
     document.body.appendChild(a);
     a.click();
     document.body.removeChild(a);
@@ -57,7 +57,7 @@ export function RecapResult({ result, onReset }: RecapResultProps) {
           <button
             onClick={handleDownload}
             className="flex items-center px-3 py-1.5 bg-content/10 hover:bg-content/20 rounded text-sm"
-            title="Tải xuống dạng Markdown"
+            title="Tải xuống dạng văn bản"
           >
             <Download className="w-4 h-4 mr-1" />
             Tải xuống

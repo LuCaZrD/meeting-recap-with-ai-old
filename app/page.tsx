@@ -4,7 +4,7 @@ import { useState } from 'react';
 import { Headphones } from "lucide-react";
 import { AudioInput } from './components/audio-input';
 import { StepIndicator } from './components/step-indicator';
-import { MeetingInfoForm, MeetingInfo } from './components/meeting-info-form';
+import { MeetingInfoForm, MeetingInfo } from './components/meeting-info-form/index';
 import { SystemPromptEditor } from './components/system-prompt-editor';
 import { ProcessingScreen } from './components/processing-screen';
 import { RecapResult } from './components/recap-result';

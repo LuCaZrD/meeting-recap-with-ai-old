@@ -7,51 +7,109 @@ interface SystemPromptEditorProps {
     title: string;
     purpose: string;
     date: string;
-    participants: string[];
+    participants: Array<{name: string; title: string;}>;
+    additionalNotes?: string;
   };
 }
 
-const DEFAULT_PROMPT = `Bạn là trợ lý AI tổng hợp và tóm tắt cuộc họp. Dựa vào bản ghi âm được chuyển thành văn bản, hãy tạo một bản tóm tắt cuộc họp có cấu trúc rõ ràng.
+// Define the default prompt template
+const DEFAULT_PROMPT_TEMPLATE = `Hãy phân tích nội dung âm thanh để xác định loại hội thoại (cuộc họp chính thức, trò chuyện cơ hội kinh doanh, thảo luận không chính thức...) và tạo bản tóm tắt với định dạng phù hợp.
 
-Bản tóm tắt nên bao gồm:
+THÔNG TIN QUAN TRỌNG THEO NGỮ CẢNH:
+{{additionalNotes}}
 
-1. Thông tin cơ bản:
-   - Tiêu đề: **{title}**
-   - Mục đích: **{purpose}** 
-   - Thời gian: **{date}**
-   - Người tham gia: **{participants}**
+NHẬN DẠNG NGỮ CẢNH:
+Đầu tiên, xác định ngữ cảnh cuộc trò chuyện dựa trên nội dung âm thanh. Đánh giá nội dung để xác định nếu đây là:
+- Cuộc họp chính thức (ví dụ: họp doanh nghiệp, dự án, đánh giá)
+- Trò chuyện về cơ hội kinh doanh (ví dụ: đàm phán, tư vấn, bán hàng)
+- Thảo luận không chính thức (ví dụ: trao đổi ý tưởng, họp nhóm nhỏ)
+- Loại hội thoại khác (xác định cụ thể)
 
-2. Tóm tắt chính (5-7 câu tổng hợp nội dung quan trọng nhất)
+THÔNG TIN CƠ BẢN:
+- Tiêu đề: {title}
+- Ngày: {date}
+- Mục đích: {purpose}
+- Người tham gia: {participants}
 
-3. Các điểm chính được thảo luận (dạng bullet points)
+TÓM TẮT CHÍNH:
+Tạo tóm tắt ngắn gọn (2-3 đoạn) về những điểm chính của cuộc trò chuyện. Tóm tắt này nên bắt đầu bằng một câu tổng quát về mục đích và bối cảnh, sau đó đi vào nội dung chính đã được thảo luận. Điều chỉnh giọng điệu và phong cách phù hợp với ngữ cảnh (ví dụ: chính thức cho cuộc họp, chuyên nghiệp nhưng thoải mái hơn cho thảo luận không chính thức).
 
-4. Quyết định đã đưa ra (nếu có)
+ĐIỂM CHÍNH:
+Liệt kê 3-7 điểm chính đã được đề cập trong cuộc trò chuyện. Đối với:
+- Cuộc họp chính thức: Tập trung vào quyết định, chiến lược và kết quả kinh doanh
+- Trò chuyện cơ hội: Nhấn mạnh nhu cầu, đề xuất giải pháp, lợi ích và các bước tiếp theo
+- Thảo luận không chính thức: Tóm tắt ý tưởng, quan điểm và chủ đề thảo luận
 
-5. Hành động cần thực hiện (các công việc, nhiệm vụ được giao)
+CÔNG VIỆC TIẾP THEO:
+Xác định các hành động tiếp theo, nhiệm vụ hoặc trách nhiệm đã được đề cập trong cuộc trò chuyện. Đối với mỗi mục, nêu rõ ai chịu trách nhiệm (nếu được đề cập) và thời hạn (nếu biết). Nếu không có công việc tiếp theo cụ thể, có thể bỏ qua phần này.
 
-6. Câu hỏi cần giải đáp tiếp theo (nếu có)
+CHI TIẾT CÓ GIÁ TRỊ:
+Liệt kê các thông tin quan trọng khác có thể hữu ích cho người dùng (số liệu, ngày tháng, thông tin liên hệ, URL, v.v.). Ưu tiên thông tin thực tế, cụ thể hơn là bình luận chung chung.
 
-7. Thời gian cho cuộc họp tiếp theo (nếu được đề cập)
+ĐỊNH DẠNG:
+Sử dụng Markdown để định dạng bản tóm tắt, bao gồm:
+- Tiêu đề (#, ##)
+- Danh sách có dấu đầu dòng (- hoặc *)
+- **In đậm** cho điểm nhấn quan trọng
+- *In nghiêng* khi thích hợp
+- > Blockquote cho các trích dẫn trực tiếp
 
-Hãy viết bằng giọng điệu chuyên nghiệp nhưng dễ hiểu. Tập trung vào những thông tin quan trọng và bỏ qua các phần tán gẫu không liên quan. Sử dụng định dạng Markdown để tổ chức nội dung.`;
+LƯU Ý: Điều chỉnh độ dài, mức độ chi tiết và tính chính thức dựa trên ngữ cảnh thực tế của cuộc trò chuyện. Tập trung vào những gì mang lại giá trị thực tế cho người dùng.
+
+LƯU Ý ĐẶC BIỆT:
+- Sử dụng đúng chức danh/vị trí của mỗi người tham gia khi nhắc đến họ trong tóm tắt
+- Ghi chú chi tiết ai đã nói điều gì khi đó là thông tin quan trọng
+- Đảm bảo sử dụng đúng chính xác các thuật ngữ chuyên ngành, tên công ty, tên sản phẩm, và các từ viết tắt được đề cập trong ghi chú bổ sung`;
 
 // Replace variables with highlighted versions for display in the UI
 const formatPromptForDisplay = (prompt: string) => {
   return prompt
-    .replace(/\*\*\{title\}\*\*/g, '<span class="param-highlight">{title}</span>')
-    .replace(/\*\*\{purpose\}\*\*/g, '<span class="param-highlight">{purpose}</span>')
-    .replace(/\*\*\{date\}\*\*/g, '<span class="param-highlight">{date}</span>')
-    .replace(/\*\*\{participants\}\*\*/g, '<span class="param-highlight">{participants}</span>');
+    .replace(/\{title\}/g, '<span class="param-highlight">{title}</span>')
+    .replace(/\{purpose\}/g, '<span class="param-highlight">{purpose}</span>')
+    .replace(/\{date\}/g, '<span class="param-highlight">{date}</span>')
+    .replace(/\{participants\}/g, '<span class="param-highlight">{participants}</span>');
 };
 
 export function SystemPromptEditor({ onSubmit, meetingInfo }: SystemPromptEditorProps) {
+  // Xử lý placeholder additionalNotes
+  const processAdditionalNotes = (info: typeof meetingInfo) => {
+    if (info.additionalNotes && info.additionalNotes.trim()) {
+      return `Người dùng cung cấp thông tin bổ sung sau đây, hãy đặc biệt lưu ý và sử dụng đúng các thuật ngữ, tên công ty, sản phẩm và viết tắt được đề cập:
+"${info.additionalNotes.trim()}"`;
+    }
+    return ''; // Return empty string if no notes
+  };
+
   // Tạo hàm để tạo prompt với tất cả thông tin
   const createFormattedPrompt = () => {
-    return DEFAULT_PROMPT
-      .replace('{title}', meetingInfo.title)
-      .replace('{purpose}', meetingInfo.purpose)
-      .replace('{date}', meetingInfo.date)
-      .replace('{participants}', meetingInfo.participants.join(', '));
+    // Tạo nội dung participants string
+    const participantsText = meetingInfo.participants
+      .map(p => {
+        const name = p.name?.trim();
+        const title = p.title?.trim();
+        if (!name) return null; // Skip participants without a name
+        return name + (title ? ` (${title})` : '');
+      })
+      .filter(Boolean) // Remove null entries
+      .join(', ') || '(Không có người tham gia được chỉ định)'; // Fallback if no valid participants
+
+    // Thay thế placeholder với các giá trị thực
+    let processedPrompt = DEFAULT_PROMPT_TEMPLATE
+      .replace('{title}', meetingInfo.title || '(Chưa có tiêu đề)')
+      .replace('{purpose}', meetingInfo.purpose || '(Chưa có mục đích)')
+      .replace('{date}', meetingInfo.date || '(Chưa có ngày)')
+      .replace('{participants}', participantsText);
+
+    // Handle additional notes - remove the section entirely if empty
+    const additionalNotesContent = processAdditionalNotes(meetingInfo);
+    if (additionalNotesContent) {
+       processedPrompt = processedPrompt.replace('{{additionalNotes}}', additionalNotesContent);
+    } else {
+      // Remove the entire "THÔNG TIN QUAN TRỌNG THEO NGỮ CẢNH" section including the heading and the placeholder line
+       processedPrompt = processedPrompt.replace(/THÔNG TIN QUAN TRỌNG THEO NGỮ CẢNH:\s*{{additionalNotes}}\s*/, '');
+    }
+
+    return processedPrompt;
   };
 
   // Khởi tạo prompt với tất cả thông tin
@@ -68,6 +126,9 @@ export function SystemPromptEditor({ onSubmit, meetingInfo }: SystemPromptEditor
       onSubmit(prompt);
     }
   };
+
+  // Hiển thị các biến với highlight - *No longer used directly for initial display*
+  // const highlightVariables = (text: string) => { ... };
 
   return (
     <div className="bg-paper border border-border rounded-lg p-6 shadow-sm">
@@ -92,12 +153,12 @@ export function SystemPromptEditor({ onSubmit, meetingInfo }: SystemPromptEditor
             id="prompt"
             value={prompt}
             onChange={(e) => setPrompt(e.target.value)}
-            rows={15}
-            className="w-full p-3 border border-border rounded bg-paper font-mono text-sm"
-            placeholder="Nhập yêu cầu chi tiết cho AI để tạo tóm tắt cuộc họp..."
+            rows={20}
+            className="w-full p-3 border border-border rounded bg-paper font-mono text-sm whitespace-pre-wrap"
+            placeholder="Xem lại và chỉnh sửa yêu cầu cho AI tại đây..."
             required
           />
-          <p className="mt-1 text-xs text-content/70">
+          <p className="mt-2 text-sm text-content/70">
             Sử dụng các biến như <span className="font-semibold bg-green-600/20 px-1 rounded text-content">{'{title}'}</span>, <span className="font-semibold bg-green-600/20 px-1 rounded text-content">{'{purpose}'}</span>, <span className="font-semibold bg-green-600/20 px-1 rounded text-content">{'{date}'}</span>, <span className="font-semibold bg-green-600/20 px-1 rounded text-content">{'{participants}'}</span> để đưa thông tin cuộc họp vào prompt.
           </p>
         </div>
