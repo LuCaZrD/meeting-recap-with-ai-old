@@ -3,8 +3,13 @@
 // Mô phỏng API Gemini (sẽ thay thế bằng API thực khi có key)
 // Trong triển khai thực tế, việc gọi API nên được thực hiện từ server
 
-import { MeetingInfo } from '@/app/components/meeting-info-form';
-import { SystemPromptConfig } from '@/app/components/system-prompt-editor';
+import { MeetingInfo } from '@/app/components/meeting-info-form/index';
+
+// Define SystemPromptConfig interface
+export interface SystemPromptConfig {
+  customPrompt: string;
+}
+
 import { optimizeAudio, transcribeAudio } from '@/app/lib/audio-processor';
 import { genAI, MODEL_NAME } from './gemini-config';
 
@@ -23,13 +28,18 @@ async function generateRecap(
   try {
     console.log('Bắt đầu tạo tóm tắt...');
     
+    // Format participants dạng mới (array of objects)
+    const participantsText = meetingInfo.participants
+      .map(p => p.name + (p.title ? ` (${p.title})` : ''))
+      .join(', ');
+    
     // Tạo prompt cho Gemini API
     const prompt = `
 Hãy tạo một tóm tắt cuộc họp với thông tin sau:
 
 Tiêu đề: ${meetingInfo.title}
 Ngày: ${meetingInfo.date}
-Người tham gia: ${meetingInfo.participants.join(', ')}
+Người tham gia: ${participantsText}
 Mục đích: ${meetingInfo.purpose}
 
 Nội dung cuộc họp:
@@ -71,13 +81,18 @@ export async function processLocalAudio(
   promptConfig: SystemPromptConfig
 ): Promise<string> {
   try {
+    // Format participants dạng mới (array of objects)
+    const participantsText = meetingInfo.participants
+      .map(p => p.name + (p.title ? ` (${p.title})` : ''))
+      .join(', ');
+      
     // Tạo prompt cho Gemini API
     const prompt = `
 Hãy tạo một tóm tắt cuộc họp với thông tin sau:
 
 Tiêu đề: ${meetingInfo.title}
 Ngày: ${meetingInfo.date}
-Người tham gia: ${meetingInfo.participants.join(', ')}
+Người tham gia: ${participantsText}
 Mục đích: ${meetingInfo.purpose}
 
 ${promptConfig.customPrompt ? `\nYêu cầu bổ sung:\n${promptConfig.customPrompt}` : ''}

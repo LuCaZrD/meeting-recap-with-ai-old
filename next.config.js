@@ -1,5 +1,6 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
+  // output: 'export',
   compress: true,
   distDir: 'out',
   images: {
@@ -41,6 +42,16 @@ const nextConfig = {
     }
     return config
   },
+  reactStrictMode: true,
 };
 
-module.exports = nextConfig;
+// Sử dụng cú pháp ES Module để tương thích với Node.js v23+
+let withNextOnPages;
+try {
+  withNextOnPages = require('@cloudflare/next-on-pages/dist/index.js');
+} catch (e) {
+  console.warn('Cloudflare Pages integration not loaded');
+  withNextOnPages = (config) => config;
+}
+
+module.exports = withNextOnPages(nextConfig);

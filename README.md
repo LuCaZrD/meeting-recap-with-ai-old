@@ -75,9 +75,20 @@ npm run dev
 
 Truy cập ứng dụng tại [http://localhost:3005](http://localhost:3005)
 
-## Triển khai
+### Triển khai lên Cloudflare Pages
 
-Dự án này đã được triển khai trên Cloudflare Pages: [https://meeting-recap-ai.pages.dev](https://meeting-recap-ai.pages.dev)
+1. Đăng ký tài khoản [Cloudflare](https://dash.cloudflare.com/sign-up)
+2. Từ dashboard, chọn "Pages" và click "Create a project"
+3. Chọn "Connect to Git" và kết nối với repository GitHub của bạn
+4. Cấu hình build:
+   - Build command: `npm run build`
+   - Build output directory: `out`
+   - Node.js version: `18.x` (hoặc cao hơn)
+5. Thêm biến môi trường trong tab "Settings > Environment variables":
+   - `NEXT_PUBLIC_GEMINI_API_KEY`: API key của bạn
+6. Trigger deploy lại và ứng dụng sẽ khả dụng tại URL của Cloudflare Pages
+
+Sau khi triển khai thành công, bạn sẽ nhận được URL để truy cập ứng dụng
 
 ## Giấy phép
 
