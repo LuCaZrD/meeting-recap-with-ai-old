@@ -55,6 +55,15 @@ const nextConfig = {
         },
       },
     };
+
+    // Thêm polyfills cho Cloudflare Workers
+    config.resolve.fallback = {
+      ...config.resolve.fallback,
+      "fs": false,
+      "path": false,
+      "os": false,
+    };
+
     return config;
   },
   reactStrictMode: true,
