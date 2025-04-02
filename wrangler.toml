@@ -1,6 +1,7 @@
 name = "meeting-recap-with-ai"
 compatibility_date = "2024-04-02"
 compatibility_flags = ["nodejs_compat"]
+pages_build_output_dir = ".next"
 
 [build]
 command = "npm run build"

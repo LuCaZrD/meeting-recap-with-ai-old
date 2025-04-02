@@ -1,6 +1,7 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   output: 'export',
+  distDir: '.next',
   images: {
     unoptimized: true,
   },
@@ -13,57 +14,12 @@ const nextConfig = {
     ignoreDuringBuilds: true,
   },
   webpack: (config) => {
-    // Tối ưu kích thước bundle
-    config.optimization = {
-      ...config.optimization,
-      minimize: true,
-      splitChunks: {
-        chunks: 'all',
-        maxInitialRequests: 25,
-        minSize: 20000,
-        maxSize: 24000000, // 24MB để đảm bảo dưới giới hạn 25MB của Cloudflare
-        cacheGroups: {
-          default: false,
-          vendors: false,
-          framework: {
-            chunks: 'all',
-            name: 'framework',
-            test: /[\\/]node_modules[\\/](react|react-dom|next)[\\/]/,
-            priority: 40,
-            enforce: true,
-          },
-          lib: {
-            test: /[\\/]node_modules[\\/]/,
-            priority: 30,
-            minChunks: 1,
-            reuseExistingChunk: true,
-          },
-          commons: {
-            name: 'commons',
-            minChunks: 2,
-            priority: 20,
-          },
-          shared: {
-            name: (module, chunks) => {
-              const allChunksNames = chunks.map((item) => item.name).join('~');
-              return `shared~${allChunksNames}`;
-            },
-            priority: 10,
-            minChunks: 2,
-            reuseExistingChunk: true,
-          },
-        },
-      },
-    };
-
-    // Thêm polyfills cho Cloudflare Workers
     config.resolve.fallback = {
       ...config.resolve.fallback,
       "fs": false,
       "path": false,
       "os": false,
     };
-
     return config;
   },
   reactStrictMode: true,
