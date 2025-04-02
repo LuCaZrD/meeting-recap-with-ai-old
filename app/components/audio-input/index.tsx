@@ -35,10 +35,10 @@ export function AudioInput({ onFileSelect }: AudioInputProps) {
         return;
       }
       
-      // Kiểm tra kích thước file (giới hạn 100MB)
-      if (file.size > 100 * 1024 * 1024) {
+      // Kiểm tra kích thước file (giới hạn 50MB)
+      if (file.size > 50 * 1024 * 1024) {
         toast.error('File quá lớn', {
-          description: 'Vui lòng tải lên file nhỏ hơn 100MB.'
+          description: 'Vui lòng tải lên file nhỏ hơn 50MB.'
         });
         return;
       }
@@ -117,7 +117,7 @@ export function AudioInput({ onFileSelect }: AudioInputProps) {
                 Nhấp để tải lên hoặc kéo thả file âm thanh vào đây
               </p>
               <p className="text-xs text-muted-foreground">
-                MP3, WAV hoặc M4A. Tối đa 100MB.
+                MP3, WAV hoặc M4A. Tối đa 50MB.
               </p>
             </div>
             
@@ -167,7 +167,7 @@ export function AudioInput({ onFileSelect }: AudioInputProps) {
                 <ul className="list-disc list-inside pl-2 space-y-1 mt-1">
                   <li>File nên được chia sẻ công khai hoặc "Ai có đường link đều xem được"</li>
                   <li>Chỉ hỗ trợ file âm thanh có định dạng MP3, WAV, M4A</li>
-                  <li>Kích thước file tối đa 100MB</li>
+                  <li>Kích thước file tối đa 50MB</li>
                 </ul>
               </div>
             </div>
